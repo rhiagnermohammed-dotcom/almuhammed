@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "المحمد",
+    "slug": "almuhammad",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "primaryColor": "#1B5E20",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.almuhammad.app"
+    },
+    "android": {
+      "package": "com.almuhammad.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#1B5E20"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
