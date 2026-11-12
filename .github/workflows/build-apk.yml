@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: 🏗️ Build Android APK
+    name: 🏗️ Build Standalone Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -34,14 +34,19 @@ jobs:
       - name: ⚙️ Make Gradlew Executable
         run: chmod +x android/gradlew
 
-      - name: 🏗️ Build Android APK
+      - name: 🔑 Configure Release Signing with Debug Key
+        run: |
+          # Use debug keystore for release build so it compiles a standalone APK with no external keys needed
+          sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle || true
+
+      - name: 🏗️ Build Standalone Release APK
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleRelease --no-daemon --stacktrace
 
-      - name: 📤 Upload Installable APK
+      - name: 📤 Upload Installable Standalone APK
         uses: actions/upload-artifact@v4
         with:
-          name: AlMuhammad-Installable-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: AlMuhammad-Standalone-APK
+          path: android/app/build/outputs/apk/release/*.apk
           retention-days: 30
