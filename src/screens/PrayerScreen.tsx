@@ -40,8 +40,24 @@ const PrayerScreen: React.FC<PrayerScreenProps> = ({ onNavigateToQibla }) => {
     asrJuristic: asrJuristic,
   };
 
-  const prayerTimes = calculatePrayerTimes(currentTime, config);
-  const nextPrayer = getNextPrayer(prayerTimes);
+  let prayerTimes = {
+    fajr: '05:00',
+    sunrise: '06:22',
+    dhuhr: '11:58',
+    asr: '15:10',
+    maghrib: '17:34',
+    isha: '18:54',
+  };
+  let nextPrayer = { name: 'fajr', nameAr: 'الفجر', time: '05:00', remaining: 'الصلاة القادمة' };
+
+  try {
+    const pt = calculatePrayerTimes(currentTime, config);
+    if (pt && pt.fajr) {
+      prayerTimes = pt;
+      const np = getNextPrayer(pt);
+      if (np && np.nameAr) nextPrayer = np;
+    }
+  } catch (err) {}
 
   useEffect(() => {
     const timer = setInterval(() => {

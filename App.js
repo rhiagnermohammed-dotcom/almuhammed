@@ -18,9 +18,47 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import Header from './src/components/Header';
 import { surahList, SurahInfo } from './src/data/surahs';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: '' };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error: String(error?.message || error) };
+  }
+
+  componentDidCatch(error, info) {
+    console.log('App Error:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <SafeAreaView style={styles.errorContainer}>
+          <Text style={styles.errorTitle}>تطبيق المحمد</Text>
+          <Text style={styles.errorSub}>
+            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+          </Text>
+          <Text style={styles.errorMsg}>
+            حدث خطأ غير متوقع. اضغط بالأسفل للعودة للشاشة الرئيسية.
+          </Text>
+          <TouchableOpacity
+            style={styles.retryBtn}
+            onPress={() => this.setState({ hasError: false, error: '' })}
+          >
+            <Text style={styles.retryBtnText}>العودة للرئيسية ↺</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 type Tab = 'home' | 'quran' | 'prayer' | 'azkar' | 'settings';
 
-export default function App() {
+function MainApp() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [activeScreen, setActiveScreen] = useState<string>('tabs');
   const [selectedSurah, setSelectedSurah] = useState<SurahInfo | null>(null);
@@ -195,6 +233,14 @@ export default function App() {
   );
 }
 
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <MainApp />
+    </ErrorBoundary>
+  );
+}
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -242,5 +288,41 @@ const styles = StyleSheet.create({
   activeTabTitle: {
     color: '#1B5E20',
     fontWeight: '800',
+  },
+  errorContainer: {
+    flex: 1,
+    backgroundColor: '#1B5E20',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  errorTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 6,
+  },
+  errorSub: {
+    fontSize: 16,
+    color: '#D4AF37',
+    marginBottom: 16,
+  },
+  errorMsg: {
+    fontSize: 14,
+    color: '#E2E8F0',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  retryBtn: {
+    backgroundColor: '#D4AF37',
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    borderRadius: 14,
+  },
+  retryBtnText: {
+    color: '#1B5E20',
+    fontWeight: '700',
+    fontSize: 15,
   },
 });

@@ -5,10 +5,7 @@ import {
   StyleSheet,
   Animated,
   Easing,
-  I18nManager,
 } from 'react-native';
-
-I18nManager.allowRTL(true);
 
 interface QiblaCompassProps {
   qiblaDirection: number;

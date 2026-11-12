@@ -3,14 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  I18nManager,
 } from 'react-native';
 
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
-
 interface PrayerCardProps {
-  prayerTimes: {
+  prayerTimes?: {
     fajr: string;
     sunrise: string;
     dhuhr: string;
@@ -18,7 +14,7 @@ interface PrayerCardProps {
     maghrib: string;
     isha: string;
   };
-  nextPrayer: { name: string; nameAr: string; time: string; remaining: string };
+  nextPrayer?: { name: string; nameAr: string; time: string; remaining: string };
 }
 
 const PRAYERS = [
@@ -30,7 +26,22 @@ const PRAYERS = [
   { key: 'isha', nameAr: 'العشاء', icon: '🌑' },
 ] as const;
 
-const PrayerCard: React.FC<PrayerCardProps> = ({ prayerTimes, nextPrayer }) => {
+const PrayerCard: React.FC<PrayerCardProps> = ({
+  prayerTimes = {
+    fajr: '05:00',
+    sunrise: '06:20',
+    dhuhr: '12:00',
+    asr: '15:15',
+    maghrib: '17:30',
+    isha: '19:00',
+  },
+  nextPrayer = {
+    name: 'fajr',
+    nameAr: 'الفجر',
+    time: '05:00',
+    remaining: '0 دقيقة',
+  },
+}) => {
   return (
     <View style={styles.container}>
       {/* Gradient-like layered background */}

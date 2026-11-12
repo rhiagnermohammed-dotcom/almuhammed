@@ -6,11 +6,6 @@
 import { StyleSheet, Platform, I18nManager } from 'react-native';
 import { arabicFontSizes, spacing, borderRadius } from './theme';
 
-// Ensure RTL is enabled
-if (!I18nManager.isRTL) {
-  I18nManager.allowRTL(true);
-  I18nManager.forceRTL(true);
-}
 
 /**
  * Common styles — theme-independent layout and structure.

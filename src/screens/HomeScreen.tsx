@@ -11,23 +11,56 @@ import PrayerCard from '../components/PrayerCard';
 import TasbeehCard from '../components/TasbeehCard';
 import { calculatePrayerTimes, getNextPrayer, CalculationMethod } from '../services/prayerTimes';
 
+const ARABIC_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const ARABIC_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+function formatArabicDate(d: Date): string {
+  try {
+    const dayName = ARABIC_DAYS[d.getDay()] || '';
+    const dayNum = d.getDate();
+    const monthName = ARABIC_MONTHS[d.getMonth()] || '';
+    const year = d.getFullYear();
+    return `${dayName}، ${dayNum} ${monthName} ${year}`;
+  } catch (e) {
+    return 'يوم مبارك';
+  }
+}
+
 interface HomeScreenProps {
   onNavigate: (screen: string, params?: any) => void;
 }
+
+const DEFAULT_PRAYER_TIMES = {
+  fajr: '05:00',
+  sunrise: '06:22',
+  dhuhr: '11:58',
+  asr: '15:10',
+  maghrib: '17:34',
+  isha: '18:54',
+};
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Default Cairo coordinates: 30.0444, 31.2357
-  const prayerTimes = calculatePrayerTimes(currentTime, {
-    latitude: 30.0444,
-    longitude: 31.2357,
-    method: CalculationMethod.Egypt,
-    asrJuristic: 0,
-  });
+  let prayerTimes = DEFAULT_PRAYER_TIMES;
+  let nextPrayer = { name: 'fajr', nameAr: 'الفجر', time: '05:00', remaining: 'الصلاة القادمة' };
 
-  const nextPrayer = getNextPrayer(prayerTimes);
+  try {
+    const pt = calculatePrayerTimes(currentTime, {
+      latitude: 30.0444,
+      longitude: 31.2357,
+      method: CalculationMethod.Egypt,
+      asrJuristic: 0,
+    });
+    if (pt && pt.fajr) {
+      prayerTimes = pt;
+      const np = getNextPrayer(pt);
+      if (np && np.nameAr) {
+        nextPrayer = np;
+      }
+    }
+  } catch (err) {}
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -53,12 +86,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         <Text style={styles.bismillah}>بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</Text>
         <Text style={styles.appTitle}>تطبيق المحمد</Text>
         <Text style={styles.dateText}>
-          {currentTime.toLocaleDateString('ar-EG', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}
+          {formatArabicDate(currentTime)}
         </Text>
       </View>
 

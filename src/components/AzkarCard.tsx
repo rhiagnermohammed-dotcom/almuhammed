@@ -4,50 +4,69 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Platform,
-  I18nManager,
+  Vibration,
 } from 'react-native';
 
-I18nManager.allowRTL(true);
+interface DhikrItem {
+  id?: number;
+  text?: string;
+  translation?: string;
+  count?: number;
+  reference?: string;
+}
 
 interface AzkarCardProps {
-  arabicText: string;
-  translation: string;
-  totalCount: number;
-  reference: string;
+  dhikr?: DhikrItem;
+  currentCount?: number;
+  onIncrement?: () => void;
+  arabicText?: string;
+  translation?: string;
+  totalCount?: number;
+  reference?: string;
   onComplete?: () => void;
 }
 
 const AzkarCard: React.FC<AzkarCardProps> = ({
-  arabicText,
-  translation,
-  totalCount,
-  reference,
+  dhikr,
+  currentCount,
+  onIncrement,
+  arabicText: propArabicText,
+  translation: propTranslation,
+  totalCount: propTotalCount,
+  reference: propReference,
   onComplete,
 }) => {
-  const [count, setCount] = useState(0);
+  const arabicText = dhikr?.text || propArabicText || '';
+  const translation = dhikr?.translation || propTranslation || '';
+  const totalCount = dhikr?.count || propTotalCount || 1;
+  const reference = dhikr?.reference || propReference || '';
+
+  const [internalCount, setInternalCount] = useState(0);
+  const count = currentCount !== undefined ? currentCount : internalCount;
   const isComplete = count >= totalCount;
-  const progress = Math.min(count / totalCount, 1);
+  const progress = Math.min(count / (totalCount || 1), 1);
 
   const handleCount = useCallback(() => {
     if (isComplete) return;
 
-    // Haptic feedback placeholder
-    if (Platform.OS === 'ios' || Platform.OS === 'android') {
-      // In production, use: import * as Haptics from 'expo-haptics';
-      // Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
+    try {
+      Vibration.vibrate(40);
+    } catch (e) {}
 
-    const newCount = count + 1;
-    setCount(newCount);
-
-    if (newCount >= totalCount && onComplete) {
-      onComplete();
+    if (onIncrement) {
+      onIncrement();
+    } else {
+      const newCount = count + 1;
+      setInternalCount(newCount);
+      if (newCount >= totalCount && onComplete) {
+        onComplete();
+      }
     }
-  }, [count, isComplete, totalCount, onComplete]);
+  }, [count, isComplete, totalCount, onComplete, onIncrement]);
 
   const handleReset = useCallback(() => {
-    setCount(0);
+    setInternalCount(0);
+  }, []);
   }, []);
 
   return (

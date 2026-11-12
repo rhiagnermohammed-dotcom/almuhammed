@@ -4,17 +4,16 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  I18nManager,
 } from 'react-native';
-
-I18nManager.allowRTL(true);
 
 interface SurahListItemProps {
   number: number;
   nameAr: string;
   nameEn: string;
-  versesCount: number;
-  revelationType: 'meccan' | 'medinan';
+  numberOfAyahs?: number;
+  versesCount?: number;
+  nameTranslation?: string;
+  revelationType: string;
   onPress: () => void;
 }
 
@@ -22,11 +21,13 @@ const SurahListItem: React.FC<SurahListItemProps> = ({
   number,
   nameAr,
   nameEn,
+  numberOfAyahs,
   versesCount,
   revelationType,
   onPress,
 }) => {
-  const isMeccan = revelationType === 'meccan';
+  const count = numberOfAyahs || versesCount || 0;
+  const isMeccan = (revelationType || '').toLowerCase() === 'meccan';
   const revelationIcon = isMeccan ? '🕋' : '🕌';
   const revelationLabel = isMeccan ? 'مكية' : 'مدنية';
 
@@ -57,7 +58,7 @@ const SurahListItem: React.FC<SurahListItemProps> = ({
           <Text style={styles.revelationIcon}>{revelationIcon}</Text>
           <Text style={styles.revelationText}>{revelationLabel}</Text>
         </View>
-        <Text style={styles.versesCount}>{versesCount} آية</Text>
+        <Text style={styles.versesCount}>{count} آية</Text>
       </View>
 
       {/* Chevron */}
